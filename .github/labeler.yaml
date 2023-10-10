@@ -23,4 +23,4 @@ test-automation:
     - '/label test-automation'
 
 task:
-    - '/label task'
+    - '/type task'
