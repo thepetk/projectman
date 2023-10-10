@@ -1,0 +1,23 @@
+documentation:
+    - '/type documentation'
+
+bug:
+    - '/type bug'
+
+enhancement:
+    - '/type feature'
+
+ci:
+    - '/label ci'
+
+config:
+    - '/label config'
+
+github-action:
+    - '/label github-action'
+
+library:
+    - '/label library'
+
+test-automation:
+    - '/label test-automation'

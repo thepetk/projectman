@@ -7,18 +7,21 @@ assignees: ''
 
 ---
 
+/type feature
+
 ## Which area this feature is related to?
 
 <!--
-    Uncomment appropriate `/area` lines, and delete the rest.
-    For example, `> /area config` would simply become: `/area config`
+    Uncomment appropriate `/label` lines, and delete the rest.
+    For example, `> /label config` would simply become: `/label config`
 -->
 
 <!-- TODO: Add more precise labels -->
-> /area github-action
-> /area config
-> /area ci
-> /area test-automation
+> /label ci
+> /label config
+> /label github-action
+> /label library
+> /label test-automation
 
 ## Which functionality do you think we should add?
 
