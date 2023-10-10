@@ -8,7 +8,7 @@ permissions:
   contents: read
 
 jobs:
-  triage:
+  labeler:
     runs-on: ubuntu-latest
     steps:
     - uses: github/issue-labeler@v3.2
