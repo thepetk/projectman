@@ -93,14 +93,17 @@ class JsonParser(Base):
                 f"{self.class_name}:: error: file {config_file.filepath} is invalid"
             )
         # TODO: Return a proper configuration object
-        return json_dict
+
+        return
 
 
 def main():
     github_provider = GithubProvider()
     config_file = github_provider.get_configuration_file()
     parser = JsonParser()
+
     # TODO: Finalize script
+
     _ = parser.parse(config_file)
 
 
