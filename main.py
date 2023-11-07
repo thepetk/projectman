@@ -2,12 +2,17 @@ import json
 import os
 import github
 
-
+REQUIRED_FIELDS = {"issues": list}
+OPTIONAL_FIELDS = {"labels": list, "prs": list}
 PROJECTMAN_FILEPATH = ".projectman.json"
 
 REPO_NAME = os.getenv("REPO")
 
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+
+
+class ProjectManValidationError(Exception):
+    pass
 
 
 class ProjectManFileNotFoundError(Exception):
@@ -42,7 +47,7 @@ class GithubProvider(Base):
         _token = github.Auth.Token(GITHUB_TOKEN)
         return github.Github(auth=_token)
 
-    def get_configuration_file(self, filepath = PROJECTMAN_FILEPATH):
+    def get_configuration_file(self, filepath=PROJECTMAN_FILEPATH):
         try:
             _r = self.github.get_repo(REPO_NAME)
         except github.GithubException:
@@ -50,7 +55,7 @@ class GithubProvider(Base):
                 f"{self.class_name}:: error: repository {REPO_NAME} not found"
             )
         try:
-            _c = _r.get_contents(filepath).decoded_content
+            _c = _r.get_contents(filepath).decoded_content.decode()
         except github.GithubException:
             raise GithubObjectNotFoundError(
                 f"{self.class_name}:: error: file {filepath} not found"
@@ -59,37 +64,50 @@ class GithubProvider(Base):
 
 
 class Configuration(Base):
-    def __init__(self):
+    def __init__(self, labels, issues, pull_requests):
+        self.labels = labels
+        self.issues = issues
+        self.pull_requests = pull_requests
         # TODO: Add attributes for project configuration
-        pass
+
 
 class JsonParser(Base):
     def _getkey(self, json_dict, key):
-        # TODO: Make a better validation method
-        if key in ["issue"] and json_dict.get(key) is None:
-            raise Exception()
+        if key in REQUIRED_FIELDS.keys() and json_dict.get(key) is None:
+            raise ProjectManValidationError(
+                f"{self.class_name}:: error: required key {key} is missing"
+            )
+        elif REQUIRED_FIELDS.get(key) and not isinstance(
+            json_dict.get(key), REQUIRED_FIELDS.get(key)
+        ):
+            raise Exception(
+                f"error: invalid type. Key {key} of type {REQUIRED_FIELDS.get(key)} has type {type(json_dict.get(key))}"
+            )
+
         else:
             return json_dict.get(key)
 
     def parse(self, config_file):
-        config_file = open(".projectman.json")
         try:
-            json_dict = json.load(config_file.content)
+            json_dict = json.loads(config_file.content)
+
         except json.decoder.JSONDecodeError:
             raise ProjectManInvalidJsonFileError(
                 f"{self.class_name}:: error: file {config_file.filepath} is invalid"
             )
         # TODO: Return a proper configuration object
-        return json_dict
+
+        return
 
 
 def main():
     github_provider = GithubProvider()
     config_file = github_provider.get_configuration_file()
     parser = JsonParser()
-    # TODO: Finalize script
-    _ = parser.parse(config_file)
 
+    # TODO: Finalize script
+
+    _ = parser.parse(config_file)
 
 
 if __name__ == "__main__":
