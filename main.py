@@ -2,12 +2,13 @@ import json
 import os
 import github
 
-REQUIRED_FIELDS = {"issues": list}
+# Optional and Required fields inside .projectman.json
 OPTIONAL_FIELDS = {"labels": list, "prs": list}
+REQUIRED_FIELDS = {"issues": list}
+
+# .projectman.json configuration variables
 PROJECTMAN_FILEPATH = ".projectman.json"
-
 REPO_NAME = os.getenv("REPO")
-
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 
 
@@ -64,10 +65,8 @@ class GithubProvider(Base):
 
 
 class Configuration(Base):
-    def __init__(self, labels, issues, pull_requests):
-        self.labels = labels
-        self.issues = issues
-        self.pull_requests = pull_requests
+    def __init__(self):
+        pass
         # TODO: Add attributes for project configuration
 
 
@@ -83,30 +82,25 @@ class JsonParser(Base):
             raise Exception(
                 f"error: invalid type. Key {key} of type {REQUIRED_FIELDS.get(key)} has type {type(json_dict.get(key))}"
             )
-
         else:
             return json_dict.get(key)
 
     def parse(self, config_file):
         try:
             json_dict = json.loads(config_file.content)
-
         except json.decoder.JSONDecodeError:
             raise ProjectManInvalidJsonFileError(
                 f"{self.class_name}:: error: file {config_file.filepath} is invalid"
             )
         # TODO: Return a proper configuration object
-
-        return
+        return json_dict
 
 
 def main():
     github_provider = GithubProvider()
     config_file = github_provider.get_configuration_file()
     parser = JsonParser()
-
     # TODO: Finalize script
-
     _ = parser.parse(config_file)
 
 
