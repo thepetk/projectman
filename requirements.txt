@@ -1,1 +1,1 @@
-json
+pytest==7.4.3
