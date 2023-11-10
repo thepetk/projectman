@@ -2,9 +2,8 @@ import json
 import os
 import github
 
-# Optional and Required fields inside .projectman.json
-OPTIONAL_FIELDS = {"labels": list, "prs": list}
-REQUIRED_FIELDS = {"issues": list}
+# Project Configuration
+CONFIGURATION_ITEM_ACCEPTED_TYPES = ["issues", "prs"]
 
 # .projectman.json configuration variables
 PROJECTMAN_FILEPATH = ".projectman.json"
@@ -12,11 +11,19 @@ REPO_NAME = os.getenv("REPO")
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 
 
-class ProjectManValidationError(Exception):
+class ProjectManConfigTypeInvalidError(Exception):
     pass
 
 
-class ProjectManFileNotFoundError(Exception):
+class FieldNotInConfigurationFieldsError(Exception):
+    pass
+
+
+class FieldValidatorNotExistsError(Exception):
+    pass
+
+
+class ProjectManValidationError(Exception):
     pass
 
 
@@ -32,6 +39,42 @@ class Base:
     @property
     def class_name(self):
         return self.__class__.__name__
+
+
+class FieldValidator(Base):
+    def __init__(self, is_one_of=None, is_instance=None, default=None, optional=True):
+        self.is_one_of = is_one_of
+        self.is_instance = is_instance
+        self.default = default
+        self.optional = optional
+
+    def validate(self, key, value):
+        if self.is_one_of is not None:
+            return value if value in self.is_one_of else self.default
+        elif self.is_instance is not None:
+            if isinstance(value, self.is_instance):
+                return value
+            elif value is None and self.optional is True:
+                return value
+            else:
+                raise ProjectManValidationError(
+                    f"error: invalid type. Key {key} of type {self.is_instance} has type {type(value)}"
+                )
+        else:
+            return value
+
+
+# Optional and Required fields inside .projectman.json
+CONFIGURATION_FIELDS = {
+    "labels": FieldValidator(is_instance=list),
+    "assignees": FieldValidator(is_instance=list),
+    "reviewers": FieldValidator(is_instance=list),
+    "milestones": FieldValidator(is_instance=list),
+    "created_on": FieldValidator(is_instance=str),
+    "last_updated_on": FieldValidator(is_instance=str),
+    "closed_on": FieldValidator(is_instance=str),
+    "type": FieldValidator(is_one_of=["issues", "pull_requests", "all"], default="all"),
+}
 
 
 class ConfigurationFile(Base):
@@ -53,7 +96,7 @@ class GithubProvider(Base):
             _r = self.github.get_repo(REPO_NAME)
         except github.GithubException:
             raise GithubObjectNotFoundError(
-                f"{self.class_name}:: error: repository {REPO_NAME} not found"
+                f"{self.class_name}:: error: bad creds or repository {REPO_NAME} not found"
             )
         try:
             _c = _r.get_contents(filepath).decoded_content.decode()
@@ -64,44 +107,139 @@ class GithubProvider(Base):
         return ConfigurationFile(content=_c, filepath=filepath)
 
 
+class ConfigurationItem(Base):
+    def __init__(
+        self,
+        item_type,
+        labels,
+        assignees,
+        milestones,
+        last_updated_on,
+        created_on,
+        closed_on,
+        reviewers=None,
+    ):
+        self.item_type = self._get_configuration_item_type(item_type)
+        self.has_labels, self.skip_labels = self._split_filters(labels)
+        self.has_assignees, self.skip_assignees = self._split_filters(assignees)
+        self.has_reviewers, self.skip_reviewers = self._split_filters(reviewers)
+        self.has_milestones, self.skip_milestones = self._split_filters(milestones)
+        self.skip_reviewers = created_on
+        self.last_updated_on = last_updated_on
+        self.created_on = created_on
+        self.closed_on = closed_on
+
+    def _get_configuration_item_type(self, item_type):
+        if item_type in CONFIGURATION_ITEM_ACCEPTED_TYPES:
+            return item_type
+        else:
+            raise ProjectManConfigTypeInvalidError(
+                f"{self.class_name}:: error: type {item_type} not in CONFIGURATION_ITEM_ACCEPTED_TYPES"
+            )
+
+    def _split_filters(self, items_list):
+        inlist = []
+        exlist = []
+
+        if items_list is None:
+            return None, None
+
+        for i in items_list:
+            if i not in exlist and i.startswith("!"):
+                exlist.append(i.replace("!", ""))
+            elif i not in inlist and not i.startswith("!"):
+                inlist.append(i)
+        return inlist, exlist
+
+
+class ConfigurationProject(Base):
+    def __init__(self, issues_item=None, pull_requests=None):
+        self.issues = issues_item
+        self.pull_requests = pull_requests
+
+
 class Configuration(Base):
+    def __init__(self, projects):
+        self.projects = projects
+
+
+class ConfigurationManager(Base):
     def __init__(self):
-        pass
-        # TODO: Add attributes for project configuration
+        self.json_parser = JsonParser()
+        self.github_provider = GithubProvider()
+
+    def generate_configuration(self):
+        config_file = self.github_provider.get_configuration_file()
+        parsed_list = self.json_parser.parse(config_file)
+        configuration_projects = []
+        for project_dict in parsed_list:
+            configuration_project = ConfigurationProject()
+            if project_dict.get("type") in ["issues", "all"]:
+                configuration_project.issues = ConfigurationItem(
+                    item_type="issues",
+                    labels=project_dict.get("labels"),
+                    assignees=project_dict.get("assignees"),
+                    milestones=project_dict.get("milestones"),
+                    last_updated_on=project_dict.get("last_updated_on"),
+                    created_on=project_dict.get("created_on"),
+                    closed_on=project_dict.get("closed_on"),
+                )
+            elif project_dict.get("type") in ["pull_requests", "all"]:
+                configuration_project.issues = ConfigurationItem(
+                    item_type="pull_requests",
+                    labels=project_dict.get("labels"),
+                    assignees=project_dict.get("assignees"),
+                    reviewers=project_dict.get("reviewers"),
+                    milestones=project_dict.get("milestones"),
+                    last_updated_on=project_dict.get("last_updated_on"),
+                    created_on=project_dict.get("created_on"),
+                    closed_on=project_dict.get("closed_on"),
+                )
+            else:
+                continue
+            configuration_projects.append(configuration_project)
+
+        return Configuration(projects=configuration_projects)
 
 
 class JsonParser(Base):
     def _getkey(self, json_dict, key):
-        if key in REQUIRED_FIELDS.keys() and json_dict.get(key) is None:
-            raise ProjectManValidationError(
-                f"{self.class_name}:: error: required key {key} is missing"
+        if key not in CONFIGURATION_FIELDS.keys():
+            raise FieldNotInConfigurationFieldsError(
+                f"error: invalid field. Field {key} is not a valid configuration field"
             )
-        elif REQUIRED_FIELDS.get(key) and not isinstance(
-            json_dict.get(key), REQUIRED_FIELDS.get(key)
-        ):
-            raise Exception(
-                f"error: invalid type. Key {key} of type {REQUIRED_FIELDS.get(key)} has type {type(json_dict.get(key))}"
+        if not isinstance(CONFIGURATION_FIELDS.get(key), FieldValidator):
+            raise FieldValidatorNotExistsError(
+                f"error: no field validator defined for key {key}"
             )
-        else:
-            return json_dict.get(key)
+        return CONFIGURATION_FIELDS[key].validate(key, json_dict.get(key))
 
     def parse(self, config_file):
+        parsed_list = []
         try:
-            json_dict = json.loads(config_file.content)
+            json_dict_list = json.loads(config_file.content)
         except json.decoder.JSONDecodeError:
             raise ProjectManInvalidJsonFileError(
                 f"{self.class_name}:: error: file {config_file.filepath} is invalid"
             )
-        # TODO: Return a proper configuration object
-        return json_dict
+
+        if not isinstance(json_dict_list, list):
+            raise ProjectManInvalidJsonFileError(
+                f"{self.class_name}:: error: file {config_file.filepath} is not a list"
+            )
+        for json_dict in json_dict_list:
+            parsed_list.append(
+                {
+                    key: self._getkey(json_dict, key)
+                    for key in CONFIGURATION_FIELDS.keys()
+                }
+            )
+        return parsed_list
 
 
 def main():
-    github_provider = GithubProvider()
-    config_file = github_provider.get_configuration_file()
-    parser = JsonParser()
-    # TODO: Finalize script
-    _ = parser.parse(config_file)
+    configuration_manager = ConfigurationManager()
+    config = configuration_manager.generate_configuration()
 
 
 if __name__ == "__main__":
