@@ -1,10 +1,9 @@
 ---
 name: 🐞 Bug report
 about: Open a bug against projectman
-title: ''
-labels: ''
-assignees: ''
-
+title: ""
+labels: ""
+assignees: ""
 ---
 
 /type bug
@@ -13,14 +12,13 @@ assignees: ''
 
 <!--
     Uncomment appropriate `/label` lines, and delete the rest.
-    For example, `> /label config` would simply become: `/label config`
+    For example, `> /label github-provider` would simply become: `/label github-provider`
 -->
 
-<!-- TODO: Add more precise labels -->
 > /label ci
-> /label config
+> /label json-configuration
+> /label github-provider
 > /label github-action
-> /label library
 > /label test-automation
 
 ## Bug Summary
@@ -42,7 +40,6 @@ assignees: ''
 <!--
     A clear and concise description of what you expected to happen.
 -->
-
 
 ## Additional context
 

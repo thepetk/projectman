@@ -1,10 +1,9 @@
 ---
 name: 🔧 Task
 about: Issue for project support
-title: ''
-labels: ''
-assignees: ''
-
+title: ""
+labels: ""
+assignees: ""
 ---
 
 /type task
@@ -13,14 +12,13 @@ assignees: ''
 
 <!--
     Uncomment appropriate `/label` lines, and delete the rest.
-    For example, `> /label config` would simply become: `/label config`
+    For example, `> /label json-configuration` would simply become: `/label json-configuration`
 -->
 
-<!-- TODO: Add more precise labels -->
 > /label ci
-> /label config
+> /label json-configuration
+> /label github-provider
 > /label github-action
-> /label library
 > /label test-automation
 
 ## Issue Description
