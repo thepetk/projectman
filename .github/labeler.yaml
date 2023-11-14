@@ -1,3 +1,4 @@
+# Types
 documentation:
     - '/type documentation'
 
@@ -10,17 +11,18 @@ enhancement:
 ci:
     - '/label ci'
 
-config:
-    - '/label config'
+task:
+    - '/type task'
+
+# Labels
+json-configuration:
+    - '/label json-configuration'
 
 github-action:
     - '/label github-action'
 
-library:
-    - '/label library'
+github-provider:
+    - '/label github-provider'
 
 test-automation:
     - '/label test-automation'
-
-task:
-    - '/type task'
