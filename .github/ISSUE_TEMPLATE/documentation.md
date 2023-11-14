@@ -1,10 +1,9 @@
 ---
 name: "📖 Documentation"
 about: Suggest an update for projectman documentation
-title: ''
-labels: ''
-assignees: ''
-
+title: ""
+labels: ""
+assignees: ""
 ---
 
 /type documentation
@@ -13,14 +12,13 @@ assignees: ''
 
 <!--
     Uncomment appropriate `/label` lines, and delete the rest.
-    For example, `> /label config` would simply become: `/label config`
+    For example, `> /label github-provider` would simply become: `/label github-provider`
 -->
 
-<!-- TODO: Add more precise labels -->
 > /label ci
-> /label config
+> /label json-configuration
+> /label github-provider
 > /label github-action
-> /label library
 > /label test-automation
 
 ## Issue details

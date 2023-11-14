@@ -1,10 +1,9 @@
 ---
 name: 💡 Feature request
 about: Suggest a new feature for projectman
-title: ''
-labels: ''
-assignees: ''
-
+title: ""
+labels: ""
+assignees: ""
 ---
 
 /type feature
@@ -13,14 +12,13 @@ assignees: ''
 
 <!--
     Uncomment appropriate `/label` lines, and delete the rest.
-    For example, `> /label config` would simply become: `/label config`
+    For example, `> /label json-configuration` would simply become: `/label json-configuration`
 -->
 
-<!-- TODO: Add more precise labels -->
 > /label ci
-> /label config
+> /label json-configuration
+> /label github-provider
 > /label github-action
-> /label library
 > /label test-automation
 
 ## Which functionality do you think we should add?
@@ -28,7 +26,6 @@ assignees: ''
 <!--
     A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
 -->
-
 
 ## Describe the solution you'd like
 
