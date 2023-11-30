@@ -17,16 +17,22 @@ values = ["issues", "pull_requests"]
 
 
 def test_field_validator_validate_success():
+    field_validator.is_one_of = ["issues", "pull_requests", "all"]
+    field_validator.default = "all"
     for value in values:
         json_dict["type"] = value
-        json_dict.validate(json_dict, "type") == json_dict["type"]
+        assert field_validator.validate("type", json_dict["type"]) == json_dict["type"]
     json_dict["type"] = "None"
-    assert field_validator.validate(json_dict, "type") == "all"
+    assert field_validator.validate("type", json_dict["type"]) == "all"
 
+    field_validator.is_one_of = None
+    field_validator.default = None
     for key in json_dict.keys():
-        assert field_validator.validate(json_dict, key) == json_dict[key]
+        field_validator.is_instance = type(json_dict[key])
+        assert field_validator.validate(key, json_dict[key]) == json_dict[key]
+    json_dict["closed_on"] = None
+    assert field_validator.validate("closed_on", json_dict["closed_on"]) is None
 
 
-# optional
 def test_field_validator_validate_failure():
     pass
