@@ -35,4 +35,9 @@ def test_field_validator_validate_success():
 
 
 def test_field_validator_validate_failure():
-    pass
+    field_validator.is_one_of = None
+    field_validator.is_instance = list
+    for value, optional in [("bvc", True), (None, False)]:
+        field_validator.optional = optional
+        with pytest.raises(ProjectManValidationError):
+            field_validator.validate("labels", value)
