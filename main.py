@@ -1,6 +1,12 @@
+from datetime import datetime
 import json
 import os
+from typing import Any, Optional
 import github
+
+# Typing items
+CONFIGURATION_VALUE = Optional[str | list[str] | bool]
+SPLITTED_FILTERS = tuple[Optional[list[str]], Optional[list[str]]]
 
 # Project Configuration
 CONFIGURATION_ITEM_ACCEPTED_TYPES = ["issues", "prs"]
@@ -37,18 +43,24 @@ class GithubObjectNotFoundError(Exception):
 
 class Base:
     @property
-    def class_name(self):
+    def class_name(self) -> str:
         return self.__class__.__name__
 
 
 class FieldValidator(Base):
-    def __init__(self, is_one_of=None, is_instance=None, default=None, optional=True):
+    def __init__(
+        self,
+        is_one_of: Optional[list[str]] = None,
+        is_instance: Any = None,
+        default: Optional[str] = None,
+        optional: bool = True,
+    ) -> None:
         self.is_one_of = is_one_of
         self.is_instance = is_instance
         self.default = default
         self.optional = optional
 
-    def validate(self, key, value):
+    def validate(self, key: str, value: CONFIGURATION_VALUE) -> CONFIGURATION_VALUE:
         if self.is_one_of is not None:
             return value if value in self.is_one_of else self.default
         elif self.is_instance is not None:
@@ -78,20 +90,22 @@ CONFIGURATION_FIELDS = {
 
 
 class ConfigurationFile(Base):
-    def __init__(self, content, filepath):
+    def __init__(self, content: str, filepath: str) -> None:
         self.content = content
         self.filepath = filepath
 
 
 class GithubProvider(Base):
-    def __init__(self):
+    def __init__(self) -> None:
         self.github = self._authenticate()
 
-    def _authenticate(self):
+    def _authenticate(self) -> github.Github:
         _token = github.Auth.Token(GITHUB_TOKEN)
         return github.Github(auth=_token)
 
-    def get_configuration_file(self, filepath=PROJECTMAN_FILEPATH):
+    def get_configuration_file(
+        self, filepath: str = PROJECTMAN_FILEPATH
+    ) -> ConfigurationFile:
         try:
             _r = self.github.get_repo(REPO_NAME)
         except github.GithubException:
@@ -110,14 +124,14 @@ class GithubProvider(Base):
 class ConfigurationItem(Base):
     def __init__(
         self,
-        item_type,
-        labels,
-        assignees,
-        milestones,
-        last_updated_on,
-        created_on,
-        closed_on,
-        reviewers=None,
+        item_type: str,
+        labels: list[str],
+        assignees: list[str],
+        milestones: list[str],
+        last_updated_on: str,
+        created_on: str,
+        closed_on: str,
+        reviewers: Optional[list[str]] = None,
     ):
         self.item_type = self._get_configuration_item_type(item_type)
         self.has_labels, self.skip_labels = self._split_filters(labels)
@@ -129,7 +143,7 @@ class ConfigurationItem(Base):
         self.created_on = created_on
         self.closed_on = closed_on
 
-    def _get_configuration_item_type(self, item_type):
+    def _get_configuration_item_type(self, item_type: str) -> str:
         if item_type in CONFIGURATION_ITEM_ACCEPTED_TYPES:
             return item_type
         else:
@@ -137,7 +151,7 @@ class ConfigurationItem(Base):
                 f"{self.class_name}:: error: type {item_type} not in CONFIGURATION_ITEM_ACCEPTED_TYPES"
             )
 
-    def _split_filters(self, items_list):
+    def _split_filters(self, items_list: Optional[str]) -> SPLITTED_FILTERS:
         inlist = []
         exlist = []
 
@@ -153,22 +167,26 @@ class ConfigurationItem(Base):
 
 
 class ConfigurationProject(Base):
-    def __init__(self, issues_item=None, pull_requests=None):
+    def __init__(
+        self,
+        issues_item: Optional[list[ConfigurationItem]] = None,
+        pull_requests: Optional[list[ConfigurationItem]] = None,
+    ) -> None:
         self.issues = issues_item
         self.pull_requests = pull_requests
 
 
 class Configuration(Base):
-    def __init__(self, projects):
+    def __init__(self, projects: list[ConfigurationProject]) -> None:
         self.projects = projects
 
 
 class ConfigurationManager(Base):
-    def __init__(self):
+    def __init__(self) -> None:
         self.json_parser = JsonParser()
         self.github_provider = GithubProvider()
 
-    def generate_configuration(self):
+    def generate_configuration(self) -> Configuration:
         config_file = self.github_provider.get_configuration_file()
         parsed_list = self.json_parser.parse(config_file)
         configuration_projects = []
@@ -184,8 +202,8 @@ class ConfigurationManager(Base):
                     created_on=project_dict.get("created_on"),
                     closed_on=project_dict.get("closed_on"),
                 )
-            elif project_dict.get("type") in ["pull_requests", "all"]:
-                configuration_project.issues = ConfigurationItem(
+            if project_dict.get("type") in ["pull_requests", "all"]:
+                configuration_project.pull_requests = ConfigurationItem(
                     item_type="pull_requests",
                     labels=project_dict.get("labels"),
                     assignees=project_dict.get("assignees"),
@@ -195,15 +213,21 @@ class ConfigurationManager(Base):
                     created_on=project_dict.get("created_on"),
                     closed_on=project_dict.get("closed_on"),
                 )
-            else:
+            if (
+                configuration_project.issues is None
+                or configuration_project.pull_requests is None
+            ):
                 continue
+
             configuration_projects.append(configuration_project)
 
         return Configuration(projects=configuration_projects)
 
 
 class JsonParser(Base):
-    def _getkey(self, json_dict, key):
+    def _getkey(
+        self, json_dict: dict[str, CONFIGURATION_VALUE], key: CONFIGURATION_VALUE
+    ) -> CONFIGURATION_VALUE:
         if key not in CONFIGURATION_FIELDS.keys():
             raise FieldNotInConfigurationFieldsError(
                 f"error: invalid field. Field {key} is not a valid configuration field"
@@ -214,7 +238,9 @@ class JsonParser(Base):
             )
         return CONFIGURATION_FIELDS[key].validate(key, json_dict.get(key))
 
-    def parse(self, config_file):
+    def parse(
+        self, config_file: ConfigurationFile
+    ) -> list[dict[str, CONFIGURATION_VALUE]]:
         parsed_list = []
         try:
             json_dict_list = json.loads(config_file.content)
