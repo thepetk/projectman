@@ -9,7 +9,7 @@ CONFIGURATION_VALUE = Optional[str | list[str] | bool]
 SPLITTED_FILTERS = tuple[Optional[list[str]], Optional[list[str]]]
 
 # Project Configuration
-CONFIGURATION_ITEM_ACCEPTED_TYPES = ["issues", "prs"]
+CONFIGURATION_ITEM_ACCEPTED_TYPES = ["issues", "prs", "all"]
 
 # .projectman.json configuration variables
 PROJECTMAN_FILEPATH = ".projectman.json"
@@ -85,7 +85,7 @@ CONFIGURATION_FIELDS = {
     "created_on": FieldValidator(is_instance=str),
     "last_updated_on": FieldValidator(is_instance=str),
     "closed_on": FieldValidator(is_instance=str),
-    "type": FieldValidator(is_one_of=["issues", "pull_requests", "all"], default="all"),
+    "type": FieldValidator(is_one_of=CONFIGURATION_ITEM_ACCEPTED_TYPES, default="all"),
 }
 
 
@@ -138,7 +138,6 @@ class ConfigurationItem(Base):
         self.has_assignees, self.skip_assignees = self._split_filters(assignees)
         self.has_reviewers, self.skip_reviewers = self._split_filters(reviewers)
         self.has_milestones, self.skip_milestones = self._split_filters(milestones)
-        self.skip_reviewers = created_on
         self.last_updated_on = last_updated_on
         self.created_on = created_on
         self.closed_on = closed_on
@@ -159,9 +158,9 @@ class ConfigurationItem(Base):
             return None, None
 
         for i in items_list:
-            if i not in exlist and i.startswith("!"):
+            if i.startswith("!"):
                 exlist.append(i.replace("!", ""))
-            elif i not in inlist and not i.startswith("!"):
+            else:
                 inlist.append(i)
         return inlist, exlist
 
