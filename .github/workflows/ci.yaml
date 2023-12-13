@@ -1,0 +1,27 @@
+name: CI
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  ci:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
+      - uses: actions/setup-python@b64ffcaf5b410884ad320a9cfac8866006a109aa # v4.8.0
+        with:
+          python-version: "3.10"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r dev-requirements.txt
+      - name: Run flake8 check
+        run: flake8 --max-line-length=88
+      - name: Run black check
+        run: black --check --line-length=88 .
+      - name: Run isort check
+        run: isort --profile black --check-only --diff .
+      - name: Test with pytest
+        run: pytest
