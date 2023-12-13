@@ -8,9 +8,9 @@ get_conf_item = ConfigurationItem(
     labels=["bug"],
     assignees=["thepetk"],
     milestones=["12/12/2023"],
-    last_updated_on="fefde",
-    created_on="hfgbdv",
-    closed_on="rfcrsd",
+    last_updated_on="2023-11-11T01:59:59",
+    created_on="2023-11-10T01:59:59",
+    closed_on="2023-11-12T01:59:59",
     reviewers=None,
 )
 
