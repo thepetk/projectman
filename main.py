@@ -6,7 +6,7 @@ import github
 
 # Typing items
 CONFIGURATION_VALUE = Optional[str | list[str] | bool]
-SPLITTED_FILTERS = tuple[Optional[list[str]], Optional[list[str]]]
+SPLITTED_FILTERS = tuple[list[str], list[str]]
 
 # Project Configuration
 CONFIGURATION_ITEM_ACCEPTED_TYPES = ["issues", "prs", "all"]
@@ -131,8 +131,8 @@ class ConfigurationItem(Base):
         last_updated_on: str,
         created_on: str,
         closed_on: str,
-        reviewers: Optional[list[str]] = None,
-    ):
+        reviewers: list[str] = [],
+    ) -> None:
         self.item_type = self._get_configuration_item_type(item_type)
         self.has_labels, self.skip_labels = self._split_filters(labels)
         self.has_assignees, self.skip_assignees = self._split_filters(assignees)
@@ -150,12 +150,9 @@ class ConfigurationItem(Base):
                 f"{self.class_name}:: error: type {item_type} not in CONFIGURATION_ITEM_ACCEPTED_TYPES"  # noqa: E501
             )
 
-    def _split_filters(self, items_list: Optional[str]) -> SPLITTED_FILTERS:
+    def _split_filters(self, items_list: list[str]) -> SPLITTED_FILTERS:
         inlist = []
         exlist = []
-
-        if items_list is None:
-            return None, None
 
         for i in items_list:
             if i.startswith("!"):
