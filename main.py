@@ -1,7 +1,7 @@
-from datetime import datetime
 import json
 import os
 from typing import Any, Optional
+
 import github
 
 # Typing items
@@ -70,7 +70,7 @@ class FieldValidator(Base):
                 return value
             else:
                 raise ProjectManValidationError(
-                    f"error: invalid type. Key {key} of type {self.is_instance} has type {type(value)}"
+                    f"error: invalid type. Key {key} of type {self.is_instance} has type {type(value)}"  # noqa: E501
                 )
         else:
             return value
@@ -110,7 +110,7 @@ class GithubProvider(Base):
             _r = self.github.get_repo(REPO_NAME)
         except github.GithubException:
             raise GithubObjectNotFoundError(
-                f"{self.class_name}:: error: bad creds or repository {REPO_NAME} not found"
+                f"{self.class_name}:: error: bad creds or repository {REPO_NAME} not found"  # noqa: E501
             )
         try:
             _c = _r.get_contents(filepath).decoded_content.decode()
@@ -148,7 +148,7 @@ class ConfigurationItem(Base):
             return item_type
         else:
             raise ProjectManConfigTypeInvalidError(
-                f"{self.class_name}:: error: type {item_type} not in CONFIGURATION_ITEM_ACCEPTED_TYPES"
+                f"{self.class_name}:: error: type {item_type} not in CONFIGURATION_ITEM_ACCEPTED_TYPES"  # noqa: E501
             )
 
     def _split_filters(self, items_list: Optional[str]) -> SPLITTED_FILTERS:
@@ -226,7 +226,9 @@ class ConfigurationManager(Base):
 
 class JsonParser(Base):
     def _getkey(
-        self, json_dict: dict[str, CONFIGURATION_VALUE], key: CONFIGURATION_VALUE
+        self,
+        json_dict: dict[str, CONFIGURATION_VALUE],
+        key: CONFIGURATION_VALUE,
     ) -> CONFIGURATION_VALUE:
         if key not in CONFIGURATION_FIELDS.keys():
             raise FieldNotInConfigurationFieldsError(
@@ -265,7 +267,7 @@ class JsonParser(Base):
 
 def main():
     configuration_manager = ConfigurationManager()
-    config = configuration_manager.generate_configuration()
+    _ = configuration_manager.generate_configuration()
 
 
 if __name__ == "__main__":

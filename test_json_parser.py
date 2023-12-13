@@ -1,11 +1,11 @@
-from main import (
-    JsonParser,
-    FieldNotInConfigurationFieldsError,
-    ConfigurationFile,
-    ProjectManInvalidJsonFileError,
-)
 import pytest
 
+from main import (
+    ConfigurationFile,
+    FieldNotInConfigurationFieldsError,
+    JsonParser,
+    ProjectManInvalidJsonFileError,
+)
 
 json_parser = JsonParser()
 filepath = "filepath"
@@ -53,7 +53,7 @@ def test_json_parser_get_key_failure_invalid_type():
 
 
 def test_json_parser_parse_success():
-    content = '[{"labels": ["bug"],"assignees": ["thepetk"],"reviewers": ["thepetk"],"milestones": ["12/12/2023"],"created_on": "dmdmd","last_updated_on": "fefde","closed_on": "rfcrsd","type": "None"}]'
+    content = '[{"labels": ["bug"],"assignees": ["thepetk"],"reviewers": ["thepetk"],"milestones": ["12/12/2023"],"created_on": "dmdmd","last_updated_on": "fefde","closed_on": "rfcrsd","type": "None"}]'  # noqa: E501
     expected_result = [
         {
             "labels": ["bug"],
@@ -72,7 +72,7 @@ def test_json_parser_parse_success():
 
 def test_json_parser_parse_failure():
     wrong_decoded_content = "{'test':'test'}"
-    no_list_content = '{"labels": ["bug"],"assignees": ["thepetk"],"reviewers": ["thepetk"],"milestones": ["12/12/2023"],"created_on": "dmdmd","last_updated_on": "fefde","closed_on": "rfcrsd","type": "None"}'
+    no_list_content = '{"labels": ["bug"],"assignees": ["thepetk"],"reviewers": ["thepetk"],"milestones": ["12/12/2023"],"created_on": "dmdmd","last_updated_on": "fefde","closed_on": "rfcrsd","type": "None"}'  # noqa: E501
 
     config_file = ConfigurationFile(content=wrong_decoded_content, filepath=filepath)
     with pytest.raises(ProjectManInvalidJsonFileError):

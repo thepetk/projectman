@@ -1,6 +1,6 @@
-from main import FieldValidator, ProjectManValidationError
 import pytest
 
+from main import FieldValidator, ProjectManValidationError
 
 field_validator = FieldValidator()
 json_dict = {
