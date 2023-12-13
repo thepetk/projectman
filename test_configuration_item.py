@@ -1,7 +1,10 @@
-from main import ConfigurationItem, ProjectManConfigTypeInvalidError
+from main import (
+    ConfigurationItem,
+    ProjectManConfigTypeInvalidError,
+    CONFIGURATION_ITEM_ACCEPTED_TYPES,
+)
 import pytest
 
-items = ["issues", "prs", "all"]
 
 get_conf_item = ConfigurationItem(
     item_type="issues",
@@ -16,9 +19,8 @@ get_conf_item = ConfigurationItem(
 
 
 def test_get_configuration_item_success():
-    for item_type in items:
-        if item_type == "issues":
-            assert get_conf_item._get_configuration_item_type(item_type) == "issues"
+    for item_type in CONFIGURATION_ITEM_ACCEPTED_TYPES:
+        assert get_conf_item._get_configuration_item_type(item_type) == item_type
 
 
 def test_get_configuration_item_failure():
