@@ -18,14 +18,24 @@ get_conf_item = ConfigurationItem(
 )
 
 
-def test_get_configuration_item_success():
+def test_get_configuration_item_type_success():
     for item_type in CONFIGURATION_ITEM_ACCEPTED_TYPES:
         assert get_conf_item._get_configuration_item_type(item_type) == item_type
 
 
-def test_get_configuration_item_failure():
-    pass
+def test_get_configuration_item_type_failure():
+    item_type = "Issues"
+    with pytest.raises(ProjectManConfigTypeInvalidError):
+        get_conf_item._get_configuration_item_type(item_type)
 
 
 def test_split_filters_success():
-    pass
+    items_list = ["one", "!two"]
+    inl = []
+    exl = []
+    for items in items_list:
+        if items.startswith("!"):
+            exl.append(items)
+        else:
+            inl.append(items)
+        assert get_conf_item._split_filters(items)
