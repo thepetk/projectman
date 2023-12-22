@@ -16,6 +16,7 @@ assignees: ""
 -->
 
 > /label ci
+> /label cli
 > /label json-configuration
 > /label github-provider
 > /label github-action
