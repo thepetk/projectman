@@ -39,7 +39,7 @@ def test_json_parser_get_key_success():
         else:
             assert json_parser._getkey(json_dict, key) == json_dict[key]
 
-    for value in ["issues", "pull_requests"]:
+    for value in ["issues", "prs"]:
         json_dict["type"] = value
         assert json_parser._getkey(json_dict, "type") == json_dict["type"]
 

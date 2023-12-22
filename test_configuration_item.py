@@ -14,7 +14,6 @@ get_conf_item = ConfigurationItem(
     last_updated_on="2023-11-11T01:59:59",
     created_on="2023-11-10T01:59:59",
     closed_on="2023-11-12T01:59:59",
-    reviewers=None,
 )
 
 
@@ -24,18 +23,13 @@ def test_get_configuration_item_type_success():
 
 
 def test_get_configuration_item_type_failure():
-    item_type = "Issues"
+    item_type = "labels"
     with pytest.raises(ProjectManConfigTypeInvalidError):
         get_conf_item._get_configuration_item_type(item_type)
 
 
 def test_split_filters_success():
     items_list = ["one", "!two"]
-    inl = []
-    exl = []
-    for items in items_list:
-        if items.startswith("!"):
-            exl.append(items)
-        else:
-            inl.append(items)
-        assert get_conf_item._split_filters(items)
+    inl = ["one"]
+    exl = ["two"]
+    assert (inl, exl) == get_conf_item._split_filters(items_list)
