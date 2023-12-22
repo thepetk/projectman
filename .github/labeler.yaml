@@ -11,6 +11,9 @@ enhancement:
 ci:
     - '/label ci'
 
+cli:
+    - '/label cli'
+
 task:
     - '/type task'
 
