@@ -68,6 +68,8 @@ class FieldValidator(Base):
                 return value
             elif value is None and self.optional is True:
                 return value
+            elif value is None and self.default is not None:
+                return self.default
             else:
                 raise ProjectManValidationError(
                     f"error: invalid type. Key {key} of type {self.is_instance} has type {type(value)}"  # noqa: E501
@@ -78,13 +80,13 @@ class FieldValidator(Base):
 
 # Optional and Required fields inside .projectman.json
 CONFIGURATION_FIELDS = {
-    "labels": FieldValidator(is_instance=list),
-    "assignees": FieldValidator(is_instance=list),
-    "reviewers": FieldValidator(is_instance=list),
-    "milestones": FieldValidator(is_instance=list),
-    "created_on": FieldValidator(is_instance=str),
-    "last_updated_on": FieldValidator(is_instance=str),
-    "closed_on": FieldValidator(is_instance=str),
+    "labels": FieldValidator(is_instance=list, default=[]),
+    "assignees": FieldValidator(is_instance=list, default=[]),
+    "reviewers": FieldValidator(is_instance=list, default=[]),
+    "milestones": FieldValidator(is_instance=list, default=[]),
+    "created_on": FieldValidator(is_instance=str, default=""),
+    "last_updated_on": FieldValidator(is_instance=str, default=""),
+    "closed_on": FieldValidator(is_instance=str, default=""),
     "type": FieldValidator(is_one_of=CONFIGURATION_ITEM_ACCEPTED_TYPES, default="all"),
 }
 
