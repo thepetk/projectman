@@ -1,10 +1,10 @@
-from main import (
-    ConfigurationItem,
-    ProjectManConfigTypeInvalidError,
-    CONFIGURATION_ITEM_ACCEPTED_TYPES,
-)
 import pytest
 
+from main import (
+    CONFIGURATION_ITEM_ACCEPTED_TYPES,
+    ConfigurationItem,
+    ProjectManConfigTypeInvalidError,
+)
 
 get_conf_item = ConfigurationItem(
     item_type="issues",
