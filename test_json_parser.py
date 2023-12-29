@@ -1,18 +1,22 @@
 import pytest
 
 from main import (
+    ALL,
+    ISSUES,
+    PULL_REQUESTS,
     ConfigurationFile,
     FieldNotInConfigurationFieldsError,
     JsonParser,
     ProjectManInvalidJsonFileError,
 )
+from mocker import GithubMocker
 
 json_parser = JsonParser()
-filepath = "filepath"
 
 
 def test_json_parser_get_key_success():
     json_dict = {
+        "name": "test",
         "labels": ["bug"],
         "assignees": ["thepetk"],
         "reviewers": ["thepetk"],
@@ -23,6 +27,7 @@ def test_json_parser_get_key_success():
         "type": "None",
     }
     keys = [
+        "name",
         "labels",
         "assignees",
         "reviewers",
@@ -35,11 +40,11 @@ def test_json_parser_get_key_success():
 
     for key in keys:
         if key == "type":
-            assert json_parser._getkey(json_dict, key) == "all"
+            assert json_parser._getkey(json_dict, key) == ALL
         else:
             assert json_parser._getkey(json_dict, key) == json_dict[key]
 
-    for value in ["issues", "prs"]:
+    for value in [ISSUES, PULL_REQUESTS]:
         json_dict["type"] = value
         assert json_parser._getkey(json_dict, "type") == json_dict["type"]
 
@@ -53,9 +58,9 @@ def test_json_parser_get_key_failure_invalid_type():
 
 
 def test_json_parser_parse_success():
-    content = '[{"labels": ["bug"],"assignees": ["thepetk"],"reviewers": ["thepetk"],"milestones": ["12/12/2023"],"created_on": "dmdmd","last_updated_on": "fefde","closed_on": "rfcrsd","type": "None"}]'  # noqa: E501
     expected_result = [
         {
+            "name": "test",
             "labels": ["bug"],
             "assignees": ["thepetk"],
             "reviewers": ["thepetk"],
@@ -63,21 +68,26 @@ def test_json_parser_parse_success():
             "created_on": "dmdmd",
             "last_updated_on": "fefde",
             "closed_on": "rfcrsd",
-            "type": "all",
+            "type": ALL,
         }
     ]
-    config_file = ConfigurationFile(content=content, filepath=filepath)
+    config_file = ConfigurationFile(
+        content=GithubMocker.SIMPLE_CONTENT, filepath=GithubMocker.FILEPATH
+    )
     assert json_parser.parse(config_file) == expected_result
 
 
 def test_json_parser_parse_failure():
     wrong_decoded_content = "{'test':'test'}"
-    no_list_content = '{"labels": ["bug"],"assignees": ["thepetk"],"reviewers": ["thepetk"],"milestones": ["12/12/2023"],"created_on": "dmdmd","last_updated_on": "fefde","closed_on": "rfcrsd","type": "None"}'  # noqa: E501
 
-    config_file = ConfigurationFile(content=wrong_decoded_content, filepath=filepath)
+    config_file = ConfigurationFile(
+        content=wrong_decoded_content, filepath=GithubMocker.FILEPATH
+    )
     with pytest.raises(ProjectManInvalidJsonFileError):
         json_parser.parse(config_file)
 
-    config_file = ConfigurationFile(content=no_list_content, filepath=filepath)
+    config_file = ConfigurationFile(
+        content=GithubMocker.NO_LIST_CONTENT, filepath=GithubMocker.FILEPATH
+    )
     with pytest.raises(ProjectManInvalidJsonFileError):
         json_parser.parse(config_file)

@@ -2,12 +2,14 @@ import pytest
 
 from main import (
     CONFIGURATION_ITEM_ACCEPTED_TYPES,
+    ISSUES,
     ConfigurationItem,
     ProjectManConfigTypeInvalidError,
 )
 
 get_conf_item = ConfigurationItem(
-    item_type="issues",
+    name="test",
+    item_type=ISSUES,
     labels=["bug"],
     assignees=["thepetk"],
     milestones=["12/12/2023"],

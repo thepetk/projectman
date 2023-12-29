@@ -1,6 +1,13 @@
 import pytest
 
-from main import FieldValidator, ProjectManValidationError
+from main import (
+    ALL,
+    CONFIGURATION_ITEM_ACCEPTED_TYPES,
+    ISSUES,
+    PULL_REQUESTS,
+    FieldValidator,
+    ProjectManValidationError,
+)
 
 field_validator = FieldValidator()
 json_dict = {
@@ -13,17 +20,16 @@ json_dict = {
     "closed_on": "rfcrsd",
 }
 
-values = ["issues", "pull_requests"]
-
 
 def test_field_validator_validate_success():
-    field_validator.is_one_of = ["issues", "pull_requests", "all"]
-    field_validator.default = "all"
+    values = [ISSUES, PULL_REQUESTS]
+    field_validator.is_one_of = CONFIGURATION_ITEM_ACCEPTED_TYPES
+    field_validator.default = ALL
     for value in values:
         json_dict["type"] = value
         assert field_validator.validate("type", json_dict["type"]) == json_dict["type"]
     json_dict["type"] = "None"
-    assert field_validator.validate("type", json_dict["type"]) == "all"
+    assert field_validator.validate("type", json_dict["type"]) == ALL
 
     field_validator.is_one_of = None
     field_validator.default = None
