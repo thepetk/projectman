@@ -3,10 +3,7 @@ from github.Repository import Repository
 
 from configuration import ConfigurationFile, ConfigurationProject
 from exceptions import GithubObjectNotFoundError
-from mockers import GithubMocker
 from utils import GITHUB_TOKEN, REPO_NAME, Base
-
-mocker = GithubMocker()
 
 
 class GithubProvider(Base):

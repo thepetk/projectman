@@ -1,1 +1,1 @@
-from .mockers import ConfigurationMocker, GithubMocker  # noqa: F401
+from .mockers import ConfigurationMocker  # noqa: F401

@@ -5,12 +5,12 @@ from exceptions import (
     FieldNotInConfigurationFieldsError,
     ProjectManInvalidJsonFileError,
 )
-from mockers import GithubMocker
+from mockers.mockers import ConfigurationMocker
 from parsers import JsonParser
 from utils import ALL, ISSUES, PULL_REQUESTS
 
 json_parser = JsonParser()
-mocker = GithubMocker(
+mocker = ConfigurationMocker(
     item_type="all",
     labels=["bug"],
     assignees=["someone", "!another"],

@@ -1,4 +1,4 @@
-from configuration import ConfigurationFile, ConfigurationManager
+from configuration import ConfigurationManager
 from parsers import JsonParser
 from providers import GithubProvider
 from utils import PROJECTMAN_FILEPATH
