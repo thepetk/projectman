@@ -1,15 +1,6 @@
 from typing import Optional
 
-from exceptions import ProjectManConfigTypeInvalidError
-from utils import (
-    ALL,
-    CONFIGURATION_DICT,
-    CONFIGURATION_ITEM_ACCEPTED_TYPES,
-    ISSUES,
-    PULL_REQUESTS,
-    SPLITTED_FILTERS,
-    Base,
-)
+from utils import ALL, CONFIGURATION_DICT, ISSUES, PULL_REQUESTS, SPLITTED_FILTERS, Base
 
 
 class ConfigurationFile(Base):
@@ -30,7 +21,7 @@ class ConfigurationItem(Base):
         closed_on: str,
         reviewers: list[str] = [],
     ) -> None:
-        self.item_type = self._get_configuration_item_type(item_type)
+        self.item_type = item_type
         self.has_labels, self.skip_labels = self._split_filters(labels)
         self.has_assignees, self.skip_assignees = self._split_filters(assignees)
         self.has_reviewers, self.skip_reviewers = self._split_filters(reviewers)
@@ -38,14 +29,6 @@ class ConfigurationItem(Base):
         self.last_updated_on = last_updated_on
         self.created_on = created_on
         self.closed_on = closed_on
-
-    def _get_configuration_item_type(self, item_type: str) -> str:
-        if item_type in CONFIGURATION_ITEM_ACCEPTED_TYPES:
-            return item_type
-        else:
-            raise ProjectManConfigTypeInvalidError(
-                f"{self.class_name}:: error: type {item_type} not in CONFIGURATION_ITEM_ACCEPTED_TYPES"  # noqa: E501
-            )
 
     def _split_filters(self, items_list: list[str]) -> SPLITTED_FILTERS:
         inlist = []

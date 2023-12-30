@@ -1,7 +1,3 @@
-class ProjectManConfigTypeInvalidError(Exception):
-    pass
-
-
 class FieldNotInConfigurationFieldsError(Exception):
     pass
 
