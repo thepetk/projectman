@@ -1,78 +1,66 @@
 import pytest
 
-from main import (
-    ALL,
-    ISSUES,
-    PULL_REQUESTS,
-    ConfigurationFile,
+from configuration import ConfigurationFile
+from exceptions import (
     FieldNotInConfigurationFieldsError,
-    JsonParser,
     ProjectManInvalidJsonFileError,
 )
-from mocker import GithubMocker
+from mockers import GithubMocker
+from parsers import JsonParser
+from utils import ALL, ISSUES, PULL_REQUESTS
 
 json_parser = JsonParser()
+mocker = GithubMocker(
+    item_type="all",
+    labels=["bug"],
+    assignees=["someone", "!another"],
+    reviewers=["reviewer", "!noreviewer"],
+    milestones=["important", "!unimportant"],
+)
 
 
 def test_json_parser_get_key_success():
-    json_dict = {
-        "name": "test",
-        "labels": ["bug"],
-        "assignees": ["thepetk"],
-        "reviewers": ["thepetk"],
-        "milestones": ["12/12/2023"],
-        "created_on": "dmdmd",
-        "last_updated_on": "fefde",
-        "closed_on": "rfcrsd",
-        "type": "None",
-    }
-    keys = [
-        "name",
-        "labels",
-        "assignees",
-        "reviewers",
-        "milestones",
-        "created_on",
-        "last_updated_on",
-        "closed_on",
-        "type",
-    ]
-
-    for key in keys:
+    for key in mocker.config_dict.keys():
         if key == "type":
-            assert json_parser._getkey(json_dict, key) == ALL
+            assert json_parser._getkey(mocker.config_dict, key) == ALL
         else:
-            assert json_parser._getkey(json_dict, key) == json_dict[key]
+            assert (
+                json_parser._getkey(mocker.config_dict, key) == mocker.config_dict[key]
+            )
 
     for value in [ISSUES, PULL_REQUESTS]:
-        json_dict["type"] = value
-        assert json_parser._getkey(json_dict, "type") == json_dict["type"]
+        mocker.config_dict["type"] = value
+        assert (
+            json_parser._getkey(mocker.config_dict, "type")
+            == mocker.config_dict["type"]
+        )
 
 
 def test_json_parser_get_key_failure_invalid_type():
     key = "None"
-    json_dict = {key: "kok"}
+    some_dict = {key: "key"}
 
     with pytest.raises(FieldNotInConfigurationFieldsError):
-        json_parser._getkey(json_dict, key)
+        json_parser._getkey(some_dict, key)
 
 
 def test_json_parser_parse_success():
     expected_result = [
         {
-            "name": "test",
+            "assignees": ["someone", "!another"],
+            "closed_on": "2023-11-11T01:59:59",
+            "created_on": "2023-11-11T01:59:59",
+            "description": "",
             "labels": ["bug"],
-            "assignees": ["thepetk"],
-            "reviewers": ["thepetk"],
-            "milestones": ["12/12/2023"],
-            "created_on": "dmdmd",
-            "last_updated_on": "fefde",
-            "closed_on": "rfcrsd",
-            "type": ALL,
+            "last_updated_on": "2023-11-11T01:59:59",
+            "milestones": ["important", "!unimportant"],
+            "name": "test",
+            "type": "pull_requests",
+            "reviewers": ["reviewer", "!noreviewer"],
         }
     ]
     config_file = ConfigurationFile(
-        content=GithubMocker.SIMPLE_CONTENT, filepath=GithubMocker.FILEPATH
+        content=mocker.list_json_content, filepath=mocker.filepath
     )
     assert json_parser.parse(config_file) == expected_result
 
@@ -81,13 +69,13 @@ def test_json_parser_parse_failure():
     wrong_decoded_content = "{'test':'test'}"
 
     config_file = ConfigurationFile(
-        content=wrong_decoded_content, filepath=GithubMocker.FILEPATH
+        content=wrong_decoded_content, filepath=mocker.filepath
     )
     with pytest.raises(ProjectManInvalidJsonFileError):
         json_parser.parse(config_file)
 
     config_file = ConfigurationFile(
-        content=GithubMocker.NO_LIST_CONTENT, filepath=GithubMocker.FILEPATH
+        content=mocker.no_list_json_content, filepath=mocker.filepath
     )
     with pytest.raises(ProjectManInvalidJsonFileError):
         json_parser.parse(config_file)

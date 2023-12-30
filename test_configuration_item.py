@@ -1,37 +1,31 @@
 import pytest
 
-from main import (
-    CONFIGURATION_ITEM_ACCEPTED_TYPES,
-    ISSUES,
-    ConfigurationItem,
-    ProjectManConfigTypeInvalidError,
-)
+from exceptions import ProjectManConfigTypeInvalidError
+from mockers import ConfigurationMocker
+from utils import CONFIGURATION_ITEM_ACCEPTED_TYPES
 
-get_conf_item = ConfigurationItem(
-    name="test",
-    item_type=ISSUES,
+mocker = ConfigurationMocker(
     labels=["bug"],
-    assignees=["thepetk"],
-    milestones=["12/12/2023"],
-    last_updated_on="2023-11-11T01:59:59",
-    created_on="2023-11-10T01:59:59",
-    closed_on="2023-11-12T01:59:59",
+    assignees=["someone", "!another"],
+    reviewers=["reviewer", "!noreviewer"],
+    milestones=["important", "!unimportant"],
 )
+config_item = mocker.configuration_item
 
 
 def test_get_configuration_item_type_success():
     for item_type in CONFIGURATION_ITEM_ACCEPTED_TYPES:
-        assert get_conf_item._get_configuration_item_type(item_type) == item_type
+        assert config_item._get_configuration_item_type(item_type) == item_type
 
 
 def test_get_configuration_item_type_failure():
     item_type = "labels"
     with pytest.raises(ProjectManConfigTypeInvalidError):
-        get_conf_item._get_configuration_item_type(item_type)
+        config_item._get_configuration_item_type(item_type)
 
 
 def test_split_filters_success():
     items_list = ["one", "!two"]
     inl = ["one"]
     exl = ["two"]
-    assert (inl, exl) == get_conf_item._split_filters(items_list)
+    assert (inl, exl) == config_item._split_filters(items_list)
