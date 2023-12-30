@@ -6,15 +6,6 @@ CONFIGURATION_VALUE = Optional[str | list[str] | bool]
 CONFIGURATION_DICT = dict[str, CONFIGURATION_VALUE]
 SPLITTED_FILTERS = tuple[list[str], list[str]]
 
-# Script environment variables
-ENV = os.getenv("PROJECTMAN_ENV", "prod")
-TEST_ENV = "test"
-
-
-def is_test_env():
-    return ENV == TEST_ENV
-
-
 # Project Configuration
 PULL_REQUESTS = "pull_requests"
 ISSUES = "issues"
@@ -28,6 +19,12 @@ GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 
 
 class Base:
+    """
+    Base is the base class for all classes used
+    inside the projectman repo. As a result every
+    class inherrits some necessary attributes.
+    """
+
     @property
     def class_name(self) -> str:
         return self.__class__.__name__

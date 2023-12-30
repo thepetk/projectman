@@ -1,32 +1,34 @@
 import github
 from github.Repository import Repository
 
-from configuration import ConfigurationProject
+from configuration import ConfigurationFile, ConfigurationProject
 from exceptions import GithubObjectNotFoundError
 from mockers import GithubMocker
-from utils import GITHUB_TOKEN, REPO_NAME, Base, is_test_env
+from utils import GITHUB_TOKEN, REPO_NAME, Base
 
 mocker = GithubMocker()
 
 
 class GithubProvider(Base):
+    """
+    GithubProvider is the class wrapping the PyGithub
+    dependency and using its functionality in order to
+    apply all actions needed in order to fetch, update,
+    create github projects according to the given
+    configuration.
+    """
+
     def __init__(self) -> None:
         self.github = self._authenticate()
 
     def _authenticate(self) -> github.Github:
-        if is_test_env():
-            return github.Github(auth=None)
         _token = github.Auth.Token(GITHUB_TOKEN)
         return github.Github(auth=_token)
 
     def _get_repo(self, _repo_name=REPO_NAME) -> Repository:
-        if is_test_env():
-            return GithubMocker.repo
         return self.github.get_repo(_repo_name)
 
     def _get_file_contents(self, _repo: Repository, filepath: str) -> str:
-        if is_test_env():
-            return GithubMocker.file_contents
         return _repo.get_contents(filepath).decoded_content.decode()
 
     def create_or_update_project(self, config_project: ConfigurationProject):
@@ -34,7 +36,14 @@ class GithubProvider(Base):
             name=config_project.name, body=config_project.description
         )
 
-    def get_file_contents(self, filepath: str) -> str:
+    def get_configuration_file(self, filepath: str) -> ConfigurationFile:
+        """
+        Gets the content (string) from a given filepath
+        inside a github repo and transforms it into a
+        ConfigurationFile type object.
+
+        :raises: GithubObjectNotFoundError
+        """
         try:
             _repo = self._get_repo(REPO_NAME)
         except github.GithubException:
@@ -47,4 +56,4 @@ class GithubProvider(Base):
             raise GithubObjectNotFoundError(
                 f"{self.class_name}:: error: file {filepath} not found"
             )
-        return _content
+        return ConfigurationFile(content=_content, filepath=filepath)

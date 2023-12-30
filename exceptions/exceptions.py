@@ -6,10 +6,6 @@ class FieldNotInConfigurationFieldsError(Exception):
     pass
 
 
-class FieldValidatorNotExistsError(Exception):
-    pass
-
-
 class ProjectManValidationError(Exception):
     pass
 

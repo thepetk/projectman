@@ -13,6 +13,8 @@ mocker = ConfigurationMocker(
     milestones=["important", "!unimportant"],
 )
 
+# ------------------ FieldValidator test cases -------------------- #
+
 
 def test_field_validator_validate_success():
     values = [ISSUES, PULL_REQUESTS]
@@ -48,3 +50,6 @@ def test_field_validator_validate_failure():
         field_validator.optional = optional
         with pytest.raises(ProjectManValidationError):
             field_validator.validate("labels", value)
+
+
+# ----------------------------------------------------------------- #

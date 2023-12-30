@@ -13,6 +13,9 @@ mocker = ConfigurationMocker(
 config_item = mocker.configuration_item
 
 
+# ----------------- ConfigurationItem test cases ------------------ #
+
+
 def test_get_configuration_item_type_success():
     for item_type in CONFIGURATION_ITEM_ACCEPTED_TYPES:
         assert config_item._get_configuration_item_type(item_type) == item_type
@@ -29,3 +32,8 @@ def test_split_filters_success():
     inl = ["one"]
     exl = ["two"]
     assert (inl, exl) == config_item._split_filters(items_list)
+
+
+# ----------------------------------------------------------------- #
+
+# TODO: Add ConfigurationManager test cases

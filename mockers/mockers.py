@@ -4,7 +4,7 @@ from github.Repository import Repository
 from github.Requester import Requester
 
 from configuration import ConfigurationItem
-from utils import CONFIGURATION_DICT, ISSUES
+from utils import ISSUES
 
 
 class ConfigurationMocker:

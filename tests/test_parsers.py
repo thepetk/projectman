@@ -19,6 +19,9 @@ mocker = GithubMocker(
 )
 
 
+# --------------------- JSON Parser test cases -------------------- #
+
+
 def test_json_parser_get_key_success():
     for key in mocker.config_dict.keys():
         if key == "type":
@@ -79,3 +82,6 @@ def test_json_parser_parse_failure():
     )
     with pytest.raises(ProjectManInvalidJsonFileError):
         json_parser.parse(config_file)
+
+
+# ----------------------------------------------------------------- #

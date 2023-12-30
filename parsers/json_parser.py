@@ -3,7 +3,6 @@ import json
 from configuration import ConfigurationFile
 from exceptions import (
     FieldNotInConfigurationFieldsError,
-    FieldValidatorNotExistsError,
     ProjectManInvalidJsonFileError,
 )
 from utils import (
@@ -31,22 +30,40 @@ CONFIGURATION_FIELDS = {
 
 
 class JsonParser(Base):
+    """
+    JSON Parser is responsible in parsing the given
+    content of .projectman.json and after its validation
+    to return a list of configuration dictionaries.
+    """
+
     def _getkey(
         self,
         json_dict: CONFIGURATION_DICT,
         key: CONFIGURATION_VALUE,
     ) -> CONFIGURATION_VALUE:
+        """
+        With the usage of the FieldValidator it checks
+        if the given key and its value are following the
+        projectman configuration format.
+
+        :raises: FieldNotInConfigurationFieldsError
+        """
+
+        # the key must be in the configuration fields
         if key not in CONFIGURATION_FIELDS.keys():
             raise FieldNotInConfigurationFieldsError(
                 f"error: invalid field. Field {key} is not a valid configuration field"
             )
-        if not isinstance(CONFIGURATION_FIELDS.get(key), FieldValidator):
-            raise FieldValidatorNotExistsError(
-                f"error: no field validator defined for key {key}"
-            )
+
         return CONFIGURATION_FIELDS[key].validate(key, json_dict.get(key))
 
     def parse(self, config_file: ConfigurationFile) -> list[CONFIGURATION_DICT]:
+        """
+        Parses a given ConfigurationFile object which contains the content
+        of the fetched projectman file.
+
+        :raises: ProjectManInvalidJsonFileError
+        """
         parsed_list = []
         try:
             json_dict_list = json.loads(config_file.content)
@@ -55,6 +72,7 @@ class JsonParser(Base):
                 f"{self.class_name}:: error: file {config_file.filepath} is invalid"
             )
 
+        # the parsed json should be a list
         if not isinstance(json_dict_list, list):
             raise ProjectManInvalidJsonFileError(
                 f"{self.class_name}:: error: file {config_file.filepath} is not a list"
