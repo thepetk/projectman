@@ -13,8 +13,7 @@ def main():
     """
     provider, parser = GithubProvider(), JsonParser()
     # Transform projectman file into config object.
-    file_contents = provider.get_file_contents(PROJECTMAN_FILEPATH)
-    config_file = ConfigurationFile(content=file_contents, filepath=PROJECTMAN_FILEPATH)
+    config_file = provider.get_configuration_file(PROJECTMAN_FILEPATH)
     parsed_list = parser.parse(config_file)
     # Upsert all given projects
     configuration_manager = ConfigurationManager(parsed_list=parsed_list)
