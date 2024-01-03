@@ -1,7 +1,7 @@
 import github
 from github.Repository import Repository
 
-from configuration import ConfigurationFile, ConfigurationProject
+from configuration import ConfigurationFile
 from exceptions import GithubObjectNotFoundError
 from utils import GITHUB_TOKEN, REPO_NAME, Base
 
@@ -27,11 +27,6 @@ class GithubProvider(Base):
 
     def _get_file_contents(self, _repo: Repository, filepath: str) -> str:
         return _repo.get_contents(filepath).decoded_content.decode()
-
-    def create_or_update_project(self, config_project: ConfigurationProject):
-        return self.github.get_user().create_project(
-            name=config_project.name, body=config_project.description
-        )
 
     def get_configuration_file(self, filepath: str) -> ConfigurationFile:
         """

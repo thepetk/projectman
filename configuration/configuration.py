@@ -62,9 +62,6 @@ class Configuration(Base):
 
 
 class ConfigurationManager(Base):
-    def __init__(self, parsed_list: list[CONFIGURATION_DICT]) -> None:
-        self.parsed_list = parsed_list
-
     def _create_config_item(
         self, item_type: str, project_dict: CONFIGURATION_DICT
     ) -> ConfigurationItem:
@@ -83,7 +80,10 @@ class ConfigurationManager(Base):
     ) -> Configuration:
         _config_projects = []
         for project_dict in parsed_list:
-            configuration_project = ConfigurationProject(name=project_dict.get("name"))
+            configuration_project = ConfigurationProject(
+                name=project_dict.get("name"),
+                description=project_dict.get("description"),
+            )
             if project_dict.get("type") in [ISSUES, ALL]:
                 configuration_project.issues = self._create_config_item(
                     ISSUES, project_dict

@@ -12,12 +12,13 @@ def main():
     of the configuration manager.
     """
     provider, parser = GithubProvider(), JsonParser()
+    configuration_manager = ConfigurationManager()
+
     # Transform projectman file into config object.
     config_file = provider.get_configuration_file(PROJECTMAN_FILEPATH)
     parsed_list = parser.parse(config_file)
     # Upsert all given projects
-    configuration_manager = ConfigurationManager(parsed_list=parsed_list)
-    configuration = configuration_manager.generate_configuration()
+    configuration = configuration_manager.generate_configuration(parsed_list)
     for project in configuration.projects:
         provider.create_or_update_project(project)
 
