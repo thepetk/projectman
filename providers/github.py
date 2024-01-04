@@ -80,6 +80,18 @@ class GithubProvider(Base):
                 config_project.description,
             )
         )
+        self._update_issues(config_project)
+        self._update_pull_requests()
+
+    def _update_issues(self, config_project: ConfigurationProject):
+        repo = self._get_repo()
+        issues = repo.get_issues()
+        for issue in issues:
+            pass
+            # TODO : add issues of desired labels into the project
+
+    def _update_pull_requests():
+        return
 
     def _graphql_query(self, query: str) -> dict[str, Any]:
         _, data = self.github.get_user()._requester.requestJsonAndCheck(
