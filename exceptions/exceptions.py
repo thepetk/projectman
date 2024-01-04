@@ -12,3 +12,7 @@ class ProjectManInvalidJsonFileError(Exception):
 
 class GithubObjectNotFoundError(Exception):
     pass
+
+
+class GithubGraphQLQueryError(Exception):
+    pass

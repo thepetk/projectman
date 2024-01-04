@@ -54,6 +54,7 @@ def test_json_parser_parse_success():
             "closed_on": "2023-11-11T01:59:59",
             "created_on": "2023-11-11T01:59:59",
             "description": "",
+            "public": True,
             "labels": ["bug"],
             "last_updated_on": "2023-11-11T01:59:59",
             "milestones": ["important", "!unimportant"],
