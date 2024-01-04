@@ -25,7 +25,7 @@ def now() -> str:
     return datetime.datetime.now().strftime("%d/%m/%Y-%H:%M:%S")
 
 
-def get_logger() -> logging.StreamHandler:
+def get_logger() -> logging.Logger:
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     logging.getLogger("urllib3").setLevel(logging.WARNING)
     logger = logging.getLogger("myLogger")
