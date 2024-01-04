@@ -4,7 +4,7 @@ import github
 from github.Repository import Repository
 
 from configuration import ConfigurationFile, ConfigurationProject
-from exceptions import GithubObjectNotFoundError, GithubGraphQLQueryError
+from exceptions import GithubGraphQLQueryError, GithubObjectNotFoundError
 from utils import GITHUB_TOKEN, REPO_NAME, Base, logger, now
 
 
@@ -163,4 +163,4 @@ class GraphQLQuery:
                 projectV2 { id }
             }
         }
-        """
+        """  # noqa: E501
