@@ -1,7 +1,7 @@
 from configuration import ConfigurationManager
 from parsers import JsonParser
 from providers import GithubProvider
-from utils import PROJECTMAN_FILEPATH, REPO_NAME, now, logger
+from utils import PROJECTMAN_FILEPATH, REPO_NAME, logger, now
 
 
 def main():
