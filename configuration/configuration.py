@@ -1,6 +1,15 @@
 from typing import Optional
 
-from utils import ALL, CONFIGURATION_DICT, ISSUES, PULL_REQUESTS, SPLITTED_FILTERS, Base
+from utils import (
+    ALL,
+    CONFIGURATION_DICT,
+    ISSUES,
+    PULL_REQUESTS,
+    SPLITTED_FILTERS,
+    Base,
+    logger,
+    now,
+)
 
 
 class ConfigurationFile(Base):
@@ -33,7 +42,9 @@ class ConfigurationItem(Base):
     def _split_filters(self, items_list: list[str]) -> SPLITTED_FILTERS:
         inlist = []
         exlist = []
-
+        logger.debug(
+            "%s::DEBUG::<%s>::splitting %s" % (now(), self.class_name, items_list)
+        )
         for i in items_list:
             if i.startswith("!"):
                 exlist.append(i.replace("!", ""))
@@ -47,11 +58,13 @@ class ConfigurationProject(Base):
         self,
         name: str,
         description: str,
+        public: bool,
         issues: Optional[list[ConfigurationItem]] = None,
         pull_requests: Optional[list[ConfigurationItem]] = None,
     ) -> None:
         self.name = name
         self.description = description
+        self.public = public
         self.issues = issues
         self.pull_requests = pull_requests
 
@@ -80,9 +93,14 @@ class ConfigurationManager(Base):
     ) -> Configuration:
         _config_projects = []
         for project_dict in parsed_list:
+            logger.debug(
+                "%s::DEBUG::<%s>::generating configuration dict for %s of type %s"
+                % (now(), self.class_name, project_dict["name"], project_dict["type"])
+            )
             configuration_project = ConfigurationProject(
                 name=project_dict.get("name"),
                 description=project_dict.get("description"),
+                public=project_dict.get("public"),
             )
             if project_dict.get("type") in [ISSUES, ALL]:
                 configuration_project.issues = self._create_config_item(
