@@ -81,14 +81,110 @@ class GithubProvider(Base):
             )
         )
         self._update_issues(config_project)
-        self._update_pull_requests()
+        # self._update_pull_requests()
 
     def _update_issues(self, config_project: ConfigurationProject):
         repo = self._get_repo()
         issues = repo.get_issues()
         for issue in issues:
-            pass
-            # TODO : add issues of desired labels into the project
+            # labels
+            if (
+                not config_project.issues.skip_labels
+                and not config_project.issues.has_labels
+            ):
+                self._add_to_project(issue)
+                continue
+
+            labels = issue.get_labels()
+            has_skipped_label = False
+
+            for config_label in config_project.issues.skip_labels:
+                if config_label in labels:
+                    has_skipped_label = True
+                    break
+            if has_skipped_label:
+                continue
+
+            for config_label in config_project.issues.has_labels:
+                if config_label in labels:
+                    self._add_to_project(issue)
+                    break
+            # assignees
+            if (
+                not config_project.issues.skip_assignees
+                and not config_project.issues.has_assignees
+            ):
+                self._add_to_project(issue)
+                continue
+
+            assignees = issue.get_assignees()
+            has_skipped_assignees = False
+
+            for config_assignes in config_project.issues.skip_assignees:
+                if config_assignees in assignees:
+                    has_skipped_assignees = True
+                    break
+            if has_skipped_assignees:
+                continue
+
+            for config_assignees in config_project.issues.has_assignees:
+                if config_assignees in assignees:
+                    self._add_to_project(issue)
+                    break
+
+            # reviewers
+            if (
+                not config_project.issues.skip_reviewers
+                and not config_project.issues.has_reviewers
+            ):
+                self._add_to_project(issue)
+                continue
+
+            reviewers = issue.get_reviewers()
+            has_skipped_reviewers = False
+
+            for config_reviewers in config_project.issues.skip_reviewers:
+                if config_reviewers in reviewers:
+                    has_skipped_reviewers = True
+                    break
+            if has_skipped_reviewers:
+                continue
+
+            for config_reviewers in config_project.issues.has_reviewers:
+                if config_reviewers in reviewers:
+                    self._add_to_project(issue)
+                    break
+            # milestones
+            if (
+                not config_project.issues.skip_milestones
+                and not config_project.issues.has_milestones
+            ):
+                self._add_to_project(issue)
+                continue
+
+            milestones = issue.get_milestones()
+            has_skipped_milestones = False
+
+            for config_milestones in config_project.issues.skip_milestones:
+                if config_milestones in milestones:
+                    has_skipped_milestones = True
+                    break
+            if has_skipped_milestones:
+                continue
+
+            for config_milestones in config_project.issues.has_milestones:
+                if config_milestones in milestones:
+                    self._add_to_project(issue)
+                    break
+            # last_updated_on
+            last_updated_on = issue.get_last_updated_on()
+            for config_last_updated_on in config_project.issues.last_updated_on:
+                if config_last_updated_on in last_updated_on:
+                    self._add_to_project(issue)
+                    break
+
+    def _add_to_project(self, issue):
+        print(issue.get_labels())
 
     def _update_pull_requests():
         return

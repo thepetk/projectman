@@ -59,8 +59,8 @@ class ConfigurationProject(Base):
         name: str,
         description: str,
         public: bool,
-        issues: Optional[list[ConfigurationItem]] = None,
-        pull_requests: Optional[list[ConfigurationItem]] = None,
+        issues: Optional[ConfigurationItem] = None,
+        pull_requests: Optional[ConfigurationItem] = None,
     ) -> None:
         self.name = name
         self.description = description
