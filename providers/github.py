@@ -120,7 +120,7 @@ class GithubProvider(Base):
             assignees = issue.get_assignees()
             has_skipped_assignees = False
 
-            for config_assignes in config_project.issues.skip_assignees:
+            for config_assignees in config_project.issues.skip_assignees:
                 if config_assignees in assignees:
                     has_skipped_assignees = True
                     break
