@@ -1,7 +1,7 @@
 from typing import Any, Optional
 
 from exceptions import ProjectManValidationError
-from utils import CONFIGURATION_VALUE, Base
+from utils import CONFIGURATION_VALUE, Base, logger, now
 
 
 class FieldValidator(Base):
@@ -18,6 +18,9 @@ class FieldValidator(Base):
         self.optional = optional
 
     def validate(self, key: str, value: CONFIGURATION_VALUE) -> CONFIGURATION_VALUE:
+        logger.debug(
+            "%s::DEBUG::<%s>::validating field %s" % (now(), self.class_name, key)
+        )
         if self.is_one_of is not None:
             return value if value in self.is_one_of else self.default
         elif self.is_instance is not None:

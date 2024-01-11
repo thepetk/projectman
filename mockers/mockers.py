@@ -13,6 +13,7 @@ class ConfigurationMocker:
         filepath: str = "filepath",
         name: str = "test",
         description: str = "",
+        public: bool = True,
         item_type: str = ISSUES,
         labels: list[str] = [],
         assignees: list[str] = [],
@@ -35,6 +36,7 @@ class ConfigurationMocker:
         self.config_dict = {
             "name": name,
             "description": description,
+            "public": public,
             "type": item_type,
             "labels": labels,
             "assignees": assignees,

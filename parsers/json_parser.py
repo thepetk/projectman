@@ -11,6 +11,8 @@ from utils import (
     CONFIGURATION_ITEM_ACCEPTED_TYPES,
     CONFIGURATION_VALUE,
     Base,
+    logger,
+    now,
 )
 from validators import FieldValidator
 
@@ -18,6 +20,7 @@ from validators import FieldValidator
 CONFIGURATION_FIELDS = {
     "name": FieldValidator(is_instance=str, default="ProjectMan Project"),
     "description": FieldValidator(is_instance=str, default=""),
+    "public": FieldValidator(is_instance=bool, default=True),
     "labels": FieldValidator(is_instance=list, default=[]),
     "assignees": FieldValidator(is_instance=list, default=[]),
     "reviewers": FieldValidator(is_instance=list, default=[]),
@@ -65,6 +68,10 @@ class JsonParser(Base):
         :raises: ProjectManInvalidJsonFileError
         """
         parsed_list = []
+        logger.debug(
+            "%s::DEBUG::<%s>::parsing configuration file with filepath %s"
+            % (now(), self.class_name, config_file.filepath)
+        )
         try:
             json_dict_list = json.loads(config_file.content)
         except json.decoder.JSONDecodeError:
@@ -77,6 +84,10 @@ class JsonParser(Base):
             raise ProjectManInvalidJsonFileError(
                 f"{self.class_name}:: error: file {config_file.filepath} is not a list"
             )
+        logger.debug(
+            "%s::DEBUG::<%s>::found %s projects. Validating values"
+            % (now(), self.class_name, len(json_dict_list))
+        )
         for json_dict in json_dict_list:
             parsed_list.append(
                 {

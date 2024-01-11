@@ -1,4 +1,7 @@
 # Typing Items
+import datetime
+import logging
+import logging.config
 import os
 from typing import Optional
 
@@ -16,6 +19,20 @@ CONFIGURATION_ITEM_ACCEPTED_TYPES = [PULL_REQUESTS, ISSUES, ALL]
 PROJECTMAN_FILEPATH = ".projectman.json"
 REPO_NAME = os.getenv("REPO")
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+
+
+def now() -> str:
+    return datetime.datetime.now().strftime("%d/%m/%Y-%H:%M:%S")
+
+
+def get_logger() -> logging.Logger:
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
+    logging.getLogger("urllib3").setLevel(logging.WARNING)
+    logger = logging.getLogger("myLogger")
+    return logger
+
+
+logger = get_logger()
 
 
 class Base:
